@@ -1,15 +1,18 @@
-import { useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import useBudgetStore from '../../stores/budgetStore'
 import TransactionItem from '../../components/shared/TransactionItem'
 import { formatIDR, formatDateLabel } from '../../utils/format'
+import AccountEditorModal from '../../components/shared/AccountEditorModal'
 
 export default function SemualAkunPage() {
     const navigate = useNavigate()
     const {
-        accounts, transactions, isLoading,
-        getTransactionsByDate, getNetWorth, getTotalBalance,
+        accounts, isLoading, addAccount, updateAccount,
+        getTransactionsByDate, getNetWorth,
     } = useBudgetStore()
+    const [showCreateModal, setShowCreateModal] = useState(false)
+    const [editingAccount, setEditingAccount] = useState(null)
 
     const totalAssets = accounts.filter(a => a.balance > 0).reduce((s, a) => s + a.balance, 0)
     const totalDebts = accounts.filter(a => a.balance < 0).reduce((s, a) => s + a.balance, 0)
@@ -35,8 +38,11 @@ export default function SemualAkunPage() {
                         </div>
                         <h1 className="text-lg font-bold tracking-tight text-text-primary">Semua Akun</h1>
                     </div>
-                    <button className="w-9 h-9 rounded-full hover:bg-black/5 flex items-center justify-center text-text-secondary transition-colors">
-                        <span className="material-icons-round">filter_list</span>
+                    <button
+                        onClick={() => setShowCreateModal(true)}
+                        className="w-9 h-9 rounded-full bg-primary/20 hover:bg-primary/30 flex items-center justify-center text-primary transition-colors"
+                    >
+                        <span className="material-icons-round">add</span>
                     </button>
                 </div>
 
@@ -86,11 +92,37 @@ export default function SemualAkunPage() {
                                 <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
                                     <span className="material-icons-round text-primary text-sm">account_balance</span>
                                 </div>
-                                <span className="text-sm font-medium text-text-primary">{acc.name}</span>
+                                <div className="text-left">
+                                    <span className="text-sm font-medium text-text-primary block">{acc.name}</span>
+                                    <span className="text-[10px] text-text-secondary">
+                                        {acc.inBudget ? 'Masuk budget' : 'Di luar budget'}
+                                    </span>
+                                </div>
                             </div>
-                            <span className={`text-sm font-bold tabular-nums ${acc.balance < 0 ? 'text-danger' : 'text-text-primary'}`}>
-                                {formatIDR(acc.balance)}
-                            </span>
+                            <div className="flex items-center gap-2">
+                                <span className={`text-sm font-bold tabular-nums ${acc.balance < 0 ? 'text-danger' : 'text-text-primary'}`}>
+                                    {formatIDR(acc.balance)}
+                                </span>
+                                <span
+                                    role="button"
+                                    tabIndex={0}
+                                    onClick={(e) => {
+                                        e.preventDefault()
+                                        e.stopPropagation()
+                                        setEditingAccount(acc)
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' || e.key === ' ') {
+                                            e.preventDefault()
+                                            e.stopPropagation()
+                                            setEditingAccount(acc)
+                                        }
+                                    }}
+                                    className="w-7 h-7 rounded-full hover:bg-gray-100 flex items-center justify-center text-text-secondary"
+                                >
+                                    <span className="material-icons-round text-base">edit</span>
+                                </span>
+                            </div>
                         </button>
                     ))}
                 </div>
@@ -121,6 +153,21 @@ export default function SemualAkunPage() {
                     )}
                 </div>
             </main>
+
+            <AccountEditorModal
+                open={showCreateModal}
+                title="Tambah Akun"
+                onClose={() => setShowCreateModal(false)}
+                onSubmit={addAccount}
+            />
+
+            <AccountEditorModal
+                open={Boolean(editingAccount)}
+                title="Edit Akun"
+                initialAccount={editingAccount}
+                onClose={() => setEditingAccount(null)}
+                onSubmit={(payload) => updateAccount(editingAccount.id, payload)}
+            />
         </div>
     )
 }

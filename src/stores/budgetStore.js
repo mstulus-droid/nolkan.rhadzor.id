@@ -3,6 +3,22 @@ import { db, getCurrentMonth, seedInitialData } from '../db/db'
 
 const monthFromDate = (dateStr) => dateStr?.slice(0, 7) || ''
 const isMonthLTE = (leftMonth, rightMonth) => Boolean(leftMonth) && Boolean(rightMonth) && leftMonth <= rightMonth
+const normalizeAccountInput = (accountData) => {
+    const balance = Number(accountData.balance ?? 0) || 0
+    const hasCustomCleared = Object.prototype.hasOwnProperty.call(accountData, 'cleared')
+    const hasCustomUncleared = Object.prototype.hasOwnProperty.call(accountData, 'uncleared')
+
+    return {
+        name: accountData.name?.trim() || 'Akun Baru',
+        type: accountData.type || 'checking',
+        balance,
+        cleared: hasCustomCleared ? (Number(accountData.cleared) || 0) : balance,
+        uncleared: hasCustomUncleared ? (Number(accountData.uncleared) || 0) : 0,
+        icon: accountData.icon || 'account_balance',
+        color: accountData.color || '#3b82f6',
+        inBudget: accountData.inBudget !== false,
+    }
+}
 
 const useBudgetStore = create((set, get) => ({
     // State
@@ -298,7 +314,19 @@ const useBudgetStore = create((set, get) => ({
     },
 
     addAccount: async (accountData) => {
-        await db.accounts.add({ ...accountData, createdAt: new Date().toISOString() })
+        const payload = normalizeAccountInput(accountData)
+        await db.accounts.add({ ...payload, createdAt: new Date().toISOString() })
+        const accounts = await db.accounts.toArray()
+        set({ accounts })
+    },
+
+    updateAccount: async (id, updates) => {
+        const account = await db.accounts.get(id)
+        if (!account) return
+
+        const merged = { ...account, ...updates }
+        const normalized = normalizeAccountInput(merged)
+        await db.accounts.update(id, { ...normalized, updatedAt: new Date().toISOString() })
         const accounts = await db.accounts.toArray()
         set({ accounts })
     },
