@@ -10,6 +10,23 @@ db.version(1).stores({
     settings: 'key',
 })
 
+// Upgrade schema to index category sort order for budget UI operations
+db.version(2).stores({
+    accounts: '++id, name, type',
+    categories: '++id, name, group, sortOrder',
+    transactions: '++id, date, accountId, categoryId, type',
+    budgets: '++id, month, categoryId',
+    settings: 'key',
+}).upgrade(async (tx) => {
+    let order = 1
+    await tx.table('categories').toCollection().modify((category) => {
+        if (category.sortOrder === undefined || category.sortOrder === null) {
+            category.sortOrder = order
+            order += 1
+        }
+    })
+})
+
 // Explicitly open the database and handle errors
 db.open().catch(err => {
     console.error('Failed to open NolkanDB:', err.stack || err)
