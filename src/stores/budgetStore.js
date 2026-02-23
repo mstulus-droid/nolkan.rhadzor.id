@@ -363,9 +363,17 @@ const useBudgetStore = create((set, get) => ({
     },
 
     addCategory: async (categoryData) => {
-        await db.categories.add(categoryData)
+        const maxSort = await db.categories.orderBy('sortOrder').last()
+        const id = await db.categories.add({
+            name: categoryData.name?.trim() || 'Kategori Baru',
+            group: categoryData.group?.trim() || 'Lainnya',
+            icon: categoryData.icon || 'storefront',
+            color: categoryData.color || '#94a3b8',
+            sortOrder: (maxSort?.sortOrder || 0) + 1,
+        })
         const categories = await db.categories.orderBy('sortOrder').toArray()
         set({ categories })
+        return id
     },
 
     updateTransaction: async (id, updates) => {

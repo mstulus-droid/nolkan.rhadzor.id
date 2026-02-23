@@ -4,19 +4,21 @@ import { formatIDR } from '../../utils/format'
 import { getCategoryColorClass } from '../../utils/format'
 import MonthNavigator from '../../components/shared/MonthNavigator'
 import ProgressBar from '../../components/shared/ProgressBar'
+import CategoryEditorModal from '../../components/shared/CategoryEditorModal'
 
 export default function NolkanBudgetPage() {
     const {
         categories, currentMonth, setMonth,
         getBudgetForCategory, getCategoryActivity, getCategoryAvailable,
         getCategoryGroups, getToBeBudgeted, getTotalIncome, getTotalBudgeted, getTotalBalance,
-        allocateFunds,
+        allocateFunds, addCategory,
     } = useBudgetStore()
 
     const [editingId, setEditingId] = useState(null)
     const [editValue, setEditValue] = useState('')
     const [collapsedGroups, setCollapsedGroups] = useState({})
     const [budgetNotice, setBudgetNotice] = useState('')
+    const [showCategoryModal, setShowCategoryModal] = useState(false)
 
     const groups = getCategoryGroups()
     const tbb = getToBeBudgeted()
@@ -25,6 +27,7 @@ export default function NolkanBudgetPage() {
     const totalBalance = getTotalBalance()
 
     const budgetGroups = Object.entries(groups).filter(([g]) => g !== 'Pemasukan')
+    const groupNames = budgetGroups.map(([groupName]) => groupName)
 
     const toggleGroup = (groupName) => {
         setCollapsedGroups(prev => ({ ...prev, [groupName]: !prev[groupName] }))
@@ -49,6 +52,16 @@ export default function NolkanBudgetPage() {
         if (e.key === 'Escape') { setEditingId(null); setEditValue('') }
     }
 
+    const handleAddCategory = async (payload) => {
+        const categoryId = await addCategory(payload)
+        if (payload.budgeted > 0) {
+            const result = await allocateFunds(categoryId, payload.budgeted, currentMonth)
+            setBudgetNotice(result?.message || '')
+        } else {
+            setBudgetNotice('')
+        }
+    }
+
     return (
         <div className="min-h-full">
             {/* Page header */}
@@ -57,7 +70,10 @@ export default function NolkanBudgetPage() {
                     <MonthNavigator month={currentMonth} onMonthChange={setMonth} />
                 </div>
                 <div className="flex items-center gap-3">
-                    <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-100 text-sm font-medium text-text-secondary hover:bg-gray-200 transition-colors">
+                    <button
+                        onClick={() => setShowCategoryModal(true)}
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-100 text-sm font-medium text-text-secondary hover:bg-gray-200 transition-colors"
+                    >
                         <span className="material-icons-round text-lg">add</span>
                         Tambah Kategori
                     </button>
@@ -245,6 +261,14 @@ export default function NolkanBudgetPage() {
                     })}
                 </div>
             </div>
+
+            <CategoryEditorModal
+                open={showCategoryModal}
+                title="Tambah Kategori Budget"
+                existingGroups={groupNames}
+                onClose={() => setShowCategoryModal(false)}
+                onSubmit={handleAddCategory}
+            />
         </div>
     )
 }

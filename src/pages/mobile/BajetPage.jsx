@@ -4,17 +4,19 @@ import { formatIDR } from '../../utils/format'
 import { getCategoryColorClass } from '../../utils/format'
 import MonthNavigator from '../../components/shared/MonthNavigator'
 import ProgressBar from '../../components/shared/ProgressBar'
+import CategoryEditorModal from '../../components/shared/CategoryEditorModal'
 
 export default function BajetPage() {
     const {
         categories, currentMonth, setMonth,
         getBudgetForCategory, getCategoryActivity, getCategoryAvailable,
         getCategoryGroups, getToBeBudgeted, getTotalBalance,
-        allocateFunds,
+        allocateFunds, addCategory,
     } = useBudgetStore()
     const [editingId, setEditingId] = useState(null)
     const [editValue, setEditValue] = useState('')
     const [budgetNotice, setBudgetNotice] = useState('')
+    const [showCategoryModal, setShowCategoryModal] = useState(false)
 
     const groups = getCategoryGroups()
     const tbb = getToBeBudgeted()
@@ -22,6 +24,7 @@ export default function BajetPage() {
 
     // Filter out income categories
     const budgetGroups = Object.entries(groups).filter(([g]) => g !== 'Pemasukan')
+    const groupNames = budgetGroups.map(([groupName]) => groupName)
 
     const startEdit = (categoryId) => {
         const budget = getBudgetForCategory(categoryId, currentMonth)
@@ -41,15 +44,33 @@ export default function BajetPage() {
         if (event.key === 'Enter') commitEdit(categoryId)
     }
 
+    const handleAddCategory = async (payload) => {
+        const categoryId = await addCategory(payload)
+        if (payload.budgeted > 0) {
+            const result = await allocateFunds(categoryId, payload.budgeted, currentMonth)
+            setBudgetNotice(result?.message || '')
+        } else {
+            setBudgetNotice('')
+        }
+    }
+
     return (
         <div className="flex flex-col h-full overflow-hidden">
             {/* Header */}
             <header className="safe-top px-4 pt-4 pb-2 bg-background-light shrink-0">
                 <div className="flex items-center justify-between mb-2">
                     <h1 className="text-lg font-bold text-text-primary">Budget</h1>
-                    <span className="text-xs text-text-secondary bg-white px-2 py-1 rounded-full border border-gray-100 shadow-sm">
-                        Tap angka untuk ubah
-                    </span>
+                    <div className="flex items-center gap-2">
+                        <span className="text-xs text-text-secondary bg-white px-2 py-1 rounded-full border border-gray-100 shadow-sm">
+                            Tap angka untuk ubah
+                        </span>
+                        <button
+                            onClick={() => setShowCategoryModal(true)}
+                            className="w-8 h-8 rounded-full bg-white border border-gray-100 shadow-sm flex items-center justify-center text-text-secondary"
+                        >
+                            <span className="material-icons-round text-base">add</span>
+                        </button>
+                    </div>
                 </div>
                 <MonthNavigator month={currentMonth} onMonthChange={setMonth} />
             </header>
@@ -155,6 +176,14 @@ export default function BajetPage() {
                     )
                 })}
             </main>
+
+            <CategoryEditorModal
+                open={showCategoryModal}
+                title="Tambah Kategori Budget"
+                existingGroups={groupNames}
+                onClose={() => setShowCategoryModal(false)}
+                onSubmit={handleAddCategory}
+            />
         </div>
     )
 }
