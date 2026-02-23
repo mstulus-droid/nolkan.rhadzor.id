@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Perencanaan Nolkan Terang Konsisten</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0df269",
+                        "primary-dark": "#0bc956",
+                        "background-light": "#f5f8f7",
+                        "background-dark": "#102217",
+                        "gold": "#d9a404",
+                        "danger": "#ef4444",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"], // For financial numbers
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>.safe-top {
+            padding-top: max(1rem, env(safe-area-inset-top));
+        }
+        .safe-bottom {
+            padding-bottom: max(1rem, env(safe-area-inset-bottom));
+        }.no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }.tabular-nums {
+            font-variant-numeric: tabular-nums;
+        }
+    </style>
+<style>
+        body {
+          min-height: max(884px, 100dvh);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light text-slate-800 font-display antialiased h-screen flex flex-col overflow-hidden selection:bg-primary selection:text-black">
+<header class="bg-white border-b border-gray-200 sticky top-0 z-20 shadow-sm safe-top pb-3 px-4">
+<div class="flex items-center justify-between">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 active:bg-gray-200 transition-colors">
+<span class="material-icons text-slate-600">chevron_left</span>
+</button>
+<h1 class="text-lg font-semibold tracking-tight text-slate-900">
+            Februari 2026
+        </h1>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 active:bg-gray-200 transition-colors">
+<span class="material-icons text-slate-600">chevron_right</span>
+</button>
+<div class="absolute right-4 hidden"> 
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 active:bg-gray-200 transition-colors">
+<span class="material-icons text-slate-600">more_vert</span>
+</button>
+</div>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto no-scrollbar pb-32">
+<div class="px-4 py-6 bg-white">
+<div class="bg-gradient-to-br from-slate-50 to-white border border-gray-100 rounded-xl shadow-sm p-5 text-center relative overflow-hidden">
+<div class="absolute top-0 right-0 w-24 h-24 bg-primary/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+<div class="absolute bottom-0 left-0 w-16 h-16 bg-gold/10 rounded-full blur-xl -ml-8 -mb-8"></div>
+<p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1 relative z-10">Tersedia Untuk Dinolkan</p>
+<div class="text-3xl font-bold text-gold tabular-nums tracking-tight font-display relative z-10 drop-shadow-sm">
+                Rp 5.000.000
+            </div>
+<div class="mt-2 text-xs text-slate-400">
+                Dana belum dialokasikan ke kategori
+            </div>
+</div>
+</div>
+<div class="sticky top-0 bg-background-light z-10 px-4 py-2 border-b border-gray-200 text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center backdrop-blur-sm bg-opacity-95">
+<div class="flex-1">Kategori</div>
+<div class="w-20 text-right">Anggaran</div>
+<div class="w-20 text-right">Keluar</div>
+<div class="w-20 text-right">Sisa</div>
+</div>
+<div class="px-4 space-y-6 mt-4">
+<section>
+<div class="flex items-center justify-between mb-2">
+<h3 class="text-sm font-bold text-slate-800 flex items-center">
+<span class="material-icons text-primary text-sm mr-1">expand_more</span>
+                    TAGIHAN TETAP
+                </h3>
+<span class="text-xs text-slate-400 font-display">Rp 850.000</span>
+</div>
+<div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+<div class="flex items-center py-3 px-3 border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors">
+<div class="flex-1">
+<div class="text-sm font-medium text-slate-700">Listrik</div>
+</div>
+<div class="w-20 text-right">
+<span class="text-xs font-display text-slate-600">500k</span>
+</div>
+<div class="w-20 text-right">
+<span class="text-xs font-display text-slate-600">500k</span>
+</div>
+<div class="w-20 text-right flex justify-end">
+<span class="inline-block px-2 py-0.5 bg-gray-100 text-gray-400 rounded text-[10px] font-display font-bold">0</span>
+</div>
+</div>
+<div class="flex items-center py-3 px-3 border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors">
+<div class="flex-1">
+<div class="text-sm font-medium text-slate-700">Internet</div>
+</div>
+<div class="w-20 text-right">
+<span class="text-xs font-display text-slate-600">350k</span>
+</div>
+<div class="w-20 text-right">
+<span class="text-xs font-display text-slate-300">0</span>
+</div>
+<div class="w-20 text-right flex justify-end">
+<span class="inline-block px-2 py-0.5 bg-primary/20 text-green-700 rounded text-[10px] font-display font-bold">350k</span>
+</div>
+</div>
+</div>
+</section>
+<section>
+<div class="flex items-center justify-between mb-2">
+<h3 class="text-sm font-bold text-slate-800 flex items-center">
+<span class="material-icons text-primary text-sm mr-1">expand_more</span>
+                    HARIAN
+                </h3>
+<span class="text-xs text-slate-400 font-display">Rp 3.850.000</span>
+</div>
+<div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+<div class="flex items-center py-3 px-3 border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors">
+<div class="flex-1">
+<div class="text-sm font-medium text-slate-700">Makan &amp; Minum</div>
+</div>
+<div class="w-20 text-right">
+<span class="text-xs font-display text-slate-600">2.000k</span>
+</div>
+<div class="w-20 text-right">
+<span class="text-xs font-display text-slate-600">150k</span>
+</div>
+<div class="w-20 text-right flex justify-end">
+<span class="inline-block px-2 py-0.5 bg-primary text-black rounded text-[10px] font-display font-bold">1.850k</span>
+</div>
+</div>
+<div class="flex items-center py-3 px-3 border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors">
+<div class="flex-1">
+<div class="text-sm font-medium text-slate-700">Transportasi</div>
+</div>
+<div class="w-20 text-right">
+<span class="text-xs font-display text-slate-600">500k</span>
+</div>
+<div class="w-20 text-right">
+<span class="text-xs font-display text-slate-600">50k</span>
+</div>
+<div class="w-20 text-right flex justify-end">
+<span class="inline-block px-2 py-0.5 bg-primary text-black rounded text-[10px] font-display font-bold">450k</span>
+</div>
+</div>
+<div class="flex items-center py-3 px-3 border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors group">
+<div class="flex-1">
+<div class="text-sm font-medium text-slate-700 flex items-center">
+                            Hiburan
+                            <span class="ml-1 w-1.5 h-1.5 rounded-full bg-danger"></span>
+</div>
+</div>
+<div class="w-20 text-right">
+<span class="text-xs font-display text-slate-600">200k</span>
+</div>
+<div class="w-20 text-right">
+<span class="text-xs font-display text-slate-600">250k</span>
+</div>
+<div class="w-20 text-right flex justify-end">
+<span class="inline-block px-2 py-0.5 bg-danger/10 text-danger rounded text-[10px] font-display font-bold">-50k</span>
+</div>
+</div>
+</div>
+</section>
+<section>
+<div class="flex items-center justify-between mb-2">
+<h3 class="text-sm font-bold text-slate-800 flex items-center">
+<span class="material-icons text-primary text-sm mr-1">expand_more</span>
+                    TABUNGAN &amp; INVESTASI
+                </h3>
+<span class="text-xs text-slate-400 font-display">Rp 1.000.000</span>
+</div>
+<div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+<div class="flex items-center py-3 px-3 border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors">
+<div class="flex-1">
+<div class="text-sm font-medium text-slate-700">Dana Darurat</div>
+<div class="w-full bg-gray-100 rounded-full h-1 mt-1 overflow-hidden">
+<div class="bg-primary h-1 rounded-full" style="width: 75%"></div>
+</div>
+</div>
+<div class="w-20 text-right self-start pt-1">
+<span class="text-xs font-display text-slate-600">500k</span>
+</div>
+<div class="w-20 text-right self-start pt-1">
+<span class="text-xs font-display text-slate-300">0</span>
+</div>
+<div class="w-20 text-right flex justify-end self-start pt-1">
+<span class="inline-block px-2 py-0.5 bg-primary/20 text-green-700 rounded text-[10px] font-display font-bold">500k</span>
+</div>
+</div>
+<div class="flex items-center py-3 px-3 border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors">
+<div class="flex-1">
+<div class="text-sm font-medium text-slate-700">Liburan</div>
+<div class="w-full bg-gray-100 rounded-full h-1 mt-1 overflow-hidden">
+<div class="bg-gold h-1 rounded-full" style="width: 25%"></div>
+</div>
+</div>
+<div class="w-20 text-right self-start pt-1">
+<span class="text-xs font-display text-slate-600">500k</span>
+</div>
+<div class="w-20 text-right self-start pt-1">
+<span class="text-xs font-display text-slate-300">0</span>
+</div>
+<div class="w-20 text-right flex justify-end self-start pt-1">
+<span class="inline-block px-2 py-0.5 bg-primary/20 text-green-700 rounded text-[10px] font-display font-bold">500k</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+<div class="h-10"></div>
+</main>
+<div class="fixed top-1/2 left-0 w-4 h-32 -translate-y-1/2 bg-gradient-to-r from-black/5 to-transparent pointer-events-none opacity-0 hover:opacity-100 transition-opacity"></div>
+<div class="fixed top-1/2 right-0 w-4 h-32 -translate-y-1/2 bg-gradient-to-l from-black/5 to-transparent pointer-events-none opacity-0 hover:opacity-100 transition-opacity"></div>
+
+</body></html>
