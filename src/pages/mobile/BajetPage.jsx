@@ -9,14 +9,16 @@ export default function BajetPage() {
     const {
         categories, currentMonth, setMonth,
         getBudgetForCategory, getCategoryActivity, getCategoryAvailable,
-        getCategoryGroups, getToBeBudgeted,
+        getCategoryGroups, getToBeBudgeted, getTotalBalance,
         allocateFunds,
     } = useBudgetStore()
     const [editingId, setEditingId] = useState(null)
     const [editValue, setEditValue] = useState('')
+    const [budgetNotice, setBudgetNotice] = useState('')
 
     const groups = getCategoryGroups()
     const tbb = getToBeBudgeted()
+    const totalBalance = getTotalBalance()
 
     // Filter out income categories
     const budgetGroups = Object.entries(groups).filter(([g]) => g !== 'Pemasukan')
@@ -29,7 +31,8 @@ export default function BajetPage() {
 
     const commitEdit = async (categoryId) => {
         const amount = parseInt(editValue, 10) || 0
-        await allocateFunds(categoryId, amount, currentMonth)
+        const result = await allocateFunds(categoryId, amount, currentMonth)
+        setBudgetNotice(result?.message || '')
         setEditingId(null)
         setEditValue('')
     }
@@ -65,6 +68,18 @@ export default function BajetPage() {
                     </span>
                 </div>
             </div>
+
+            <div className="mx-4 mb-3 bg-white rounded-xl shadow-card border border-gray-100 p-4">
+                <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Saldo Akun Budget</p>
+                <p className="text-xl font-bold tabular-nums text-text-primary mt-0.5">{formatIDR(totalBalance)}</p>
+                <p className="text-[11px] text-text-secondary mt-1">Dana total dari akun yang masuk budget</p>
+            </div>
+
+            {budgetNotice && (
+                <div className="mx-4 mb-3 px-3 py-2 rounded-lg bg-warning-light text-warning text-xs font-medium">
+                    {budgetNotice}
+                </div>
+            )}
 
             {/* Category list */}
             <main className="flex-1 overflow-y-auto no-scrollbar px-4 pb-24 space-y-4">

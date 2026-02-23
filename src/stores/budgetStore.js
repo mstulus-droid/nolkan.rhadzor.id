@@ -3,8 +3,9 @@ import { db, getCurrentMonth, seedInitialData } from '../db/db'
 
 const monthFromDate = (dateStr) => dateStr?.slice(0, 7) || ''
 const isMonthLTE = (leftMonth, rightMonth) => Boolean(leftMonth) && Boolean(rightMonth) && leftMonth <= rightMonth
+const toNumber = (value) => Number(value) || 0
 const normalizeAccountInput = (accountData) => {
-    const balance = Number(accountData.balance ?? 0) || 0
+    const balance = toNumber(accountData.balance ?? 0)
     const hasCustomCleared = Object.prototype.hasOwnProperty.call(accountData, 'cleared')
     const hasCustomUncleared = Object.prototype.hasOwnProperty.call(accountData, 'uncleared')
 
@@ -12,8 +13,8 @@ const normalizeAccountInput = (accountData) => {
         name: accountData.name?.trim() || 'Akun Baru',
         type: accountData.type || 'checking',
         balance,
-        cleared: hasCustomCleared ? (Number(accountData.cleared) || 0) : balance,
-        uncleared: hasCustomUncleared ? (Number(accountData.uncleared) || 0) : 0,
+        cleared: hasCustomCleared ? toNumber(accountData.cleared) : balance,
+        uncleared: hasCustomUncleared ? toNumber(accountData.uncleared) : 0,
         icon: accountData.icon || 'account_balance',
         color: accountData.color || '#3b82f6',
         inBudget: accountData.inBudget !== false,
@@ -128,6 +129,12 @@ const useBudgetStore = create((set, get) => ({
     getToBeBudgeted: (month) => {
         const m = month || get().currentMonth
         return get().getTotalBalance() - get().getTotalAvailable(m)
+    },
+
+    // Maximum additional budget that can still be allocated without going negative
+    getAllocatableAmount: (month) => {
+        const m = month || get().currentMonth
+        return Math.max(0, get().getToBeBudgeted(m))
     },
 
     // Net worth
@@ -284,33 +291,57 @@ const useBudgetStore = create((set, get) => ({
     allocateFunds: async (categoryId, amount, month) => {
         const m = month || get().currentMonth
         const existing = get().getBudgetForCategory(categoryId, m)
+        const oldBudgeted = existing?.budgeted || 0
+        const requestedBudgeted = Math.max(0, toNumber(amount))
+        const increaseNeeded = requestedBudgeted - oldBudgeted
+        const allocatable = get().getAllocatableAmount(m)
+
+        let appliedBudgeted = requestedBudgeted
+        let message = ''
+        let capped = false
+
+        if (increaseNeeded > allocatable) {
+            appliedBudgeted = oldBudgeted + allocatable
+            capped = true
+            message = 'Alokasi melebihi saldo akun budget. Nilai disesuaikan ke dana tersedia.'
+        }
 
         if (existing) {
-            await db.budgets.update(existing.id, { budgeted: amount })
+            await db.budgets.update(existing.id, { budgeted: appliedBudgeted })
         } else {
-            await db.budgets.add({ month: m, categoryId, budgeted: amount })
+            await db.budgets.add({ month: m, categoryId, budgeted: appliedBudgeted })
         }
 
         const budgets = await db.budgets.toArray()
         set({ budgets })
+        return { ok: !capped, capped, applied: appliedBudgeted, message }
     },
 
     moveMoney: async (fromCategoryId, toCategoryId, amount, month) => {
         const m = month || get().currentMonth
+        const moveAmount = Math.max(0, toNumber(amount))
+        if (moveAmount === 0) return { ok: false, message: 'Nominal pemindahan harus lebih dari 0' }
+
+        const fromAvailable = get().getCategoryAvailable(fromCategoryId, m)
+        if (fromAvailable < moveAmount) {
+            return { ok: false, message: 'Dana kategori asal tidak cukup untuk dipindahkan' }
+        }
+
         const fromBudget = get().getBudgetForCategory(fromCategoryId, m)
         const toBudget = get().getBudgetForCategory(toCategoryId, m)
 
         if (fromBudget) {
-            await db.budgets.update(fromBudget.id, { budgeted: (fromBudget.budgeted || 0) - amount })
+            await db.budgets.update(fromBudget.id, { budgeted: (fromBudget.budgeted || 0) - moveAmount })
         }
         if (toBudget) {
-            await db.budgets.update(toBudget.id, { budgeted: (toBudget.budgeted || 0) + amount })
+            await db.budgets.update(toBudget.id, { budgeted: (toBudget.budgeted || 0) + moveAmount })
         } else {
-            await db.budgets.add({ month: m, categoryId: toCategoryId, budgeted: amount })
+            await db.budgets.add({ month: m, categoryId: toCategoryId, budgeted: moveAmount })
         }
 
         const budgets = await db.budgets.toArray()
         set({ budgets })
+        return { ok: true, moved: moveAmount }
     },
 
     addAccount: async (accountData) => {

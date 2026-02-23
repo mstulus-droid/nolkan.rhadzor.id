@@ -9,18 +9,20 @@ export default function NolkanBudgetPage() {
     const {
         categories, currentMonth, setMonth,
         getBudgetForCategory, getCategoryActivity, getCategoryAvailable,
-        getCategoryGroups, getToBeBudgeted, getTotalIncome, getTotalBudgeted,
+        getCategoryGroups, getToBeBudgeted, getTotalIncome, getTotalBudgeted, getTotalBalance,
         allocateFunds,
     } = useBudgetStore()
 
     const [editingId, setEditingId] = useState(null)
     const [editValue, setEditValue] = useState('')
     const [collapsedGroups, setCollapsedGroups] = useState({})
+    const [budgetNotice, setBudgetNotice] = useState('')
 
     const groups = getCategoryGroups()
     const tbb = getToBeBudgeted()
     const totalIncome = getTotalIncome()
     const totalBudgeted = getTotalBudgeted()
+    const totalBalance = getTotalBalance()
 
     const budgetGroups = Object.entries(groups).filter(([g]) => g !== 'Pemasukan')
 
@@ -35,8 +37,9 @@ export default function NolkanBudgetPage() {
     }
 
     const commitEdit = async (categoryId) => {
-        const amount = parseInt(editValue) || 0
-        await allocateFunds(categoryId, amount, currentMonth)
+        const amount = parseInt(editValue, 10) || 0
+        const result = await allocateFunds(categoryId, amount, currentMonth)
+        setBudgetNotice(result?.message || '')
         setEditingId(null)
         setEditValue('')
     }
@@ -63,7 +66,14 @@ export default function NolkanBudgetPage() {
 
             <div className="px-8 py-6">
                 {/* Top stats row */}
-                <div className="grid grid-cols-3 gap-4 mb-8">
+                <div className="grid grid-cols-4 gap-4 mb-8">
+                    {/* In Budget Accounts */}
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-soft p-5">
+                        <p className="text-xs font-bold text-text-secondary uppercase tracking-widest mb-1">Saldo Akun Budget</p>
+                        <p className="text-2xl font-bold text-text-primary tabular-nums">{formatIDR(totalBalance)}</p>
+                        <p className="text-xs text-text-secondary mt-1">Total akun yang masuk budget</p>
+                    </div>
+
                     {/* TBB Card */}
                     <div className="col-span-1 bg-white rounded-2xl border border-gray-100 shadow-soft p-5 relative overflow-hidden">
                         <div className="absolute -right-4 -top-4 w-20 h-20 bg-gold/10 rounded-full blur-2xl" />
@@ -100,6 +110,12 @@ export default function NolkanBudgetPage() {
                         </div>
                     </div>
                 </div>
+
+                {budgetNotice && (
+                    <div className="mb-4 px-4 py-2.5 rounded-xl bg-warning-light text-warning text-sm font-medium">
+                        {budgetNotice}
+                    </div>
+                )}
 
                 {/* Budget Table */}
                 <div className="bg-white rounded-2xl border border-gray-100 shadow-soft overflow-hidden">
